@@ -1,3 +1,9 @@
+/*
+Checking If A Channel Is Ready
+
+Use a
+*/
+
 package main
 
 import (

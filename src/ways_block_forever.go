@@ -1,42 +1,51 @@
+/*
+Blocking Forever
+https://play.golang.org/p/wNYrob63tp
+
+A go routine can be blocked from running, typically when waiting to send or
+receive on a channel. Here we explore all the ways to block forever…
+
+This script results in a deadlock. The dump for each channel will explain why
+the channel is blocked.
+*/
+
 package main
 
 import "runtime"
 
-// every way I've found so far to block forever is with channels
-//
-// this script should result in a deadlock with nothing being printed
-// the error dump for each goroutine will describe why the channel is blocked
 func main() {
-	// send on a channel with no receive
+
+	// We will start with the obvious ones.
+	// Send on a channel with no receive.
 	go func() {
 		<-make(chan struct{})
 	}()
 
-	// vice versa
+	// Receive on a channel with no send.
 	go func() {
 		make(chan struct{}) <- struct{}{}
 	}()
 
-	// send on a nil channel
+	// Send on a nil channel (the channel has not been initialized).
 	go func() {
 		var a chan bool
 		a <- true
 	}()
 
-	// vice vesra
+	// Receive on a nil channel.
 	go func() {
 		var a chan bool
 		<-a
 	}()
 
-	// range on a nil channel
+	// Range on a nil channel.
 	go func() {
 		var a chan bool
 		for range a {
 		}
 	}()
 
-	// select with only nil channels
+	// Select with only nil channels.
 	go func() {
 		var a chan bool
 		select {
@@ -45,14 +54,13 @@ func main() {
 		}
 	}()
 
-	// my favorite so far… empty chan selector
+	// Here's my favorite so far, a simple one liner: the empty channel selector!
 	go func() {
 		select {}
 	}()
 
-	// causes the current goroutine to exit, without exiting func main!
-	// this only causes a crash b/c all other goroutines are asleep.
-	// we could have done real work and then called os.Exit() in another goroutine,
-	// this would be fine.
+	// To get some descriptive dumps, we cause the the current goroutine to exit,
+	// without exiting func main! This causes a fatal error because all
+	// go routines are asleep, never to be awoken from their eternal blocks.
 	runtime.Goexit()
 }

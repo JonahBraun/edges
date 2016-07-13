@@ -1,3 +1,9 @@
+/*
+Changing Types
+
+Type conversion, casting and assertion.
+*/
+
 package main
 
 import (
@@ -24,10 +30,13 @@ func (f flint) Interfacify() interface{} {
 }
 
 func main() {
-	// Conversion: newType(var)
+
+	// # Conversion
+	// Syntax: newType(var)
 	// https://golang.org/doc/effective_go.html#conversions
 
-	// Type conversion, changes underlying value (type casting)
+	// Type conversion changes the underlying value. In other languages
+	// this is called type casting.
 	a := 6.4
 	inspect(a)
 	b := int(a)

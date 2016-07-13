@@ -1,5 +1,11 @@
-// Closures enclose the vars available at declaration and not at call time.
-// To obtain call time vars, pass parameters.
+/*
+The Variable Encapsulation of Closures
+
+Exploring how variables are enclosed by anonymous functions.
+
+Closures enclose the vars available at declaration and not at call time. To obtain
+call time vars, pass parameters.
+*/
 package main
 
 import "log"
