@@ -1,0 +1,51 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Edges of Go</title>
+  <meta name="author" content="Jonah Braun">
+  <meta name="generator" content="bashfu">
+
+  <link rel="stylesheet" href="/style.css">
+	<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:300|Source+Sans+Pro' rel='stylesheet' type='text/css'>
+
+  <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+<article>
+
+<a id='header' href='/'><i>//</i>Edges┌─<br>
+<i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
+<div class="highlight"><pre><span class="cm"><i>/*</i></span>
+<span class=><h1>Channel of Nil</h1></span>
+
+<span class="cm">You can have nil channels (a channel not yet initialized), and then you can have</span>
+<span class="cm">an initialized, working channel of nil. This demonstrates the latter.</span>
+<span class="cm"><i>*/</i></span>
+
+<span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="s">&quot;fmt&quot;</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">a</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kc">nil</span><span class="p">)</span>
+
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">a</span> <span class="o">&lt;-</span> <span class="kc">nil</span>
+	<span class="p">}()</span>
+
+	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="o">&lt;-</span><span class="nx">a</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+<footer class="cm">
+<i>// </i>Errata or suggestions? Open a <a href='https://github.com/JonahBraun/edges'>
+GitHub issue</a> or email <a href='mailto:Jonah@GoodCoffee.ca'>Jonah@GoodCoffee.ca</a>.
+</footer>
+</article>
+</body>
+</html>

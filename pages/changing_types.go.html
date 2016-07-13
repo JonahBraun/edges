@@ -1,0 +1,113 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Edges of Go</title>
+  <meta name="author" content="Jonah Braun">
+  <meta name="generator" content="bashfu">
+
+  <link rel="stylesheet" href="/style.css">
+	<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:300|Source+Sans+Pro' rel='stylesheet' type='text/css'>
+
+  <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+<article>
+
+<a id='header' href='/'><i>//</i>Edges┌─<br>
+<i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
+<div class="highlight"><pre><span class="cm"><i>/*</i></span>
+<span class=><h1>Changing Types</h1></span>
+
+<span class="cm">Type conversion, casting and assertion.</span>
+<span class="cm"><i>*/</i></span>
+
+<span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;fmt&quot;</span>
+	<span class="s">&quot;strconv&quot;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nx">inspect</span><span class="p">(</span><span class="nx">v</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;%T %#v \n&quot;</span><span class="p">,</span> <span class="nx">v</span><span class="p">,</span> <span class="nx">v</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">flint</span> <span class="kt">int</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="nx">flint</span><span class="p">)</span> <span class="nx">String</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">strconv</span><span class="p">.</span><span class="nx">Itoa</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nx">f</span><span class="p">))</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="nx">flint</span><span class="p">)</span> <span class="nx">Stringify</span><span class="p">()</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Stringer</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">f</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="nx">flint</span><span class="p">)</span> <span class="nx">Interfacify</span><span class="p">()</span> <span class="kd">interface</span><span class="p">{}</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">f</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+
+	<span class="c1"><i>// </i># Conversion</span>
+	<span class="c1"><i>// </i>Syntax: newType(var)</span>
+	<span class="c1"><i>// </i><a href="https://golang.org/doc/effective_go.html#conversions">https://golang.org/doc/effective_go.html#conversions</a></span>
+
+	<span class="c1"><i>// </i>Type conversion changes the underlying value. In other languages</span>
+	<span class="c1"><i>// </i>this is called type casting.</span>
+	<span class="nx">a</span> <span class="o">:=</span> <span class="mf">6.4</span>
+	<span class="nx">inspect</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
+	<span class="nx">b</span> <span class="o">:=</span> <span class="nb">int</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
+	<span class="nx">inspect</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span>
+
+	<span class="c1"><i>// </i>Type conversion, no underlying change</span>
+	<span class="nx">c</span> <span class="o">:=</span> <span class="nx">flint</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+	<span class="nx">inspect</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+	<span class="nx">d</span> <span class="o">:=</span> <span class="nb">int</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+	<span class="nx">inspect</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span>
+
+	<span class="c1"><i>// </i>Interface Conversion aka Type Assertion: var.(interfaceName)</span>
+	<span class="c1"><i>// </i><a href="https://golang.org/doc/effective_go.html#interface_conversions">https://golang.org/doc/effective_go.html#interface_conversions</a></span>
+	<span class="c1"><i>// </i>Type assertion can only be done on interfaces- that is, it can not be performed on a type.</span>
+	<span class="c1"><i>// </i>Interfaces can be obtained by declaring a func return as that interface</span>
+	<span class="c1"><i>// </i>or by declaring a variable to be that and then assigning a type to it.</span>
+
+	<span class="c1"><i>// </i>obtain an interface from a function and then covert it</span>
+	<span class="nx">e</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Stringify</span><span class="p">()</span>
+	<span class="nx">f</span> <span class="o">:=</span> <span class="nx">e</span><span class="p">.(</span><span class="kd">interface</span><span class="p">{})</span>
+
+	<span class="c1"><i>// </i>declare an interface, assign to it and then convert it</span>
+	<span class="kd">var</span> <span class="nx">g</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Stringer</span>
+	<span class="nx">g</span> <span class="p">=</span> <span class="nx">c</span>
+	<span class="nx">inspect</span><span class="p">(</span><span class="nx">g</span><span class="p">)</span>
+	<span class="nx">inspect</span><span class="p">(</span><span class="nx">g</span><span class="p">.(</span><span class="kd">interface</span><span class="p">{}))</span>
+
+	<span class="c1"><i>// </i>Type Switch</span>
+	<span class="c1"><i>// </i>A special type of type assertion, can only be used on interfaces!</span>
+	<span class="c1"><i>// </i><a href="https://golang.org/doc/effective_go.html#type_switch">https://golang.org/doc/effective_go.html#type_switch</a></span>
+	<span class="c1"><i>// </i>First case that matches is used, below both fmt.Stringer and interface{} will match,</span>
+	<span class="c1"><i>// </i>but &quot;stringer&quot; is printed</span>
+	<span class="k">switch</span> <span class="nx">f</span> <span class="o">:=</span> <span class="nx">f</span><span class="p">.(</span><span class="kd">type</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">case</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Stringer</span><span class="p">:</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;stringer&quot;</span><span class="p">,</span> <span class="nx">f</span><span class="p">)</span>
+	<span class="k">case</span> <span class="kd">interface</span><span class="p">{}:</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;interface{}&quot;</span><span class="p">,</span> <span class="nx">f</span><span class="p">)</span>
+	<span class="k">default</span><span class="p">:</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;throw an error or something&quot;</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="c1"><i>// </i>function types act a lot like interfaces</span>
+<span class="p">}</span>
+</pre></div>
+<footer class="cm">
+<i>// </i>Errata or suggestions? Open a <a href='https://github.com/JonahBraun/edges'>
+GitHub issue</a> or email <a href='mailto:Jonah@GoodCoffee.ca'>Jonah@GoodCoffee.ca</a>.
+</footer>
+</article>
+</body>
+</html>

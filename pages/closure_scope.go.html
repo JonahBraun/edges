@@ -1,0 +1,99 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Edges of Go</title>
+  <meta name="author" content="Jonah Braun">
+  <meta name="generator" content="bashfu">
+
+  <link rel="stylesheet" href="/style.css">
+	<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:300|Source+Sans+Pro' rel='stylesheet' type='text/css'>
+
+  <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+<article>
+
+<a id='header' href='/'><i>//</i>Edges┌─<br>
+<i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
+<div class="highlight"><pre><span class="cm"><i>/*</i></span>
+<span class=><h1>The Variable Encapsulation of Closures</h1></span>
+
+<span class="cm">Exploring how variables are enclosed by anonymous functions.</span>
+
+<span class="cm">Closures enclose the vars available at declaration and not at call time. To obtain</span>
+<span class="cm">call time vars, pass parameters.</span>
+<span class="cm"><i>*/</i></span>
+<span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="s">&quot;log&quot;</span>
+
+<span class="kd">var</span> <span class="nx">foo</span> <span class="p">=</span> <span class="s">&quot;outside&quot;</span>
+<span class="kd">var</span> <span class="nx">A</span> <span class="p">=</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">factory</span><span class="p">(</span><span class="nx">a</span> <span class="kt">string</span><span class="p">)</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">log</span><span class="p">.</span><span class="nx">SetFlags</span><span class="p">(</span><span class="nx">log</span><span class="p">.</span><span class="nx">Lshortfile</span><span class="p">)</span>
+
+	<span class="nx">foo</span> <span class="p">=</span> <span class="s">&quot;main&quot;</span>
+	<span class="nx">A</span><span class="p">()</span>
+	<span class="c1"><i>//= </i><output>main</output></span>
+
+	<span class="c1"><i>// </i>foo is shadowed next while A() enclosed the outside foo</span>
+	<span class="nx">foo</span> <span class="o">:=</span> <span class="s">&quot;main 2&quot;</span>
+	<span class="nx">A</span><span class="p">()</span>
+	<span class="c1"><i>//= </i><output>main</output></span>
+
+	<span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span>
+	<span class="c1"><i>//= </i><output>main 2</output></span>
+
+	<span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span>
+		<span class="c1"><i>//= </i><output>main 2</output></span>
+	<span class="p">}()</span>
+
+	<span class="nx">B</span> <span class="o">:=</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="nx">B</span><span class="p">()</span>
+	<span class="c1"><i>//= </i><output>main 2</output></span>
+
+	<span class="nx">foo</span> <span class="p">=</span> <span class="s">&quot;main 3&quot;</span>
+	<span class="nx">B</span><span class="p">()</span>
+	<span class="c1"><i>//= </i><output>main 3</output></span>
+
+	<span class="nx">a</span> <span class="o">:=</span> <span class="s">&quot;a string&quot;</span>
+	<span class="nx">fA</span> <span class="o">:=</span> <span class="nx">factory</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
+	<span class="nx">fA</span><span class="p">()</span>
+	<span class="c1"><i>//= </i><output>a string</output></span>
+
+	<span class="nx">a</span> <span class="p">=</span> <span class="s">&quot;b string&quot;</span>
+	<span class="nx">fA</span><span class="p">()</span>
+	<span class="c1"><i>//= </i><output>a string</output></span>
+
+	<span class="kd">func</span><span class="p">(</span><span class="nx">a</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
+	<span class="p">}(</span><span class="s">&quot;new string&quot;</span><span class="p">)</span>
+	<span class="c1"><i>//= </i><output>new string</output></span>
+<span class="p">}</span>
+</pre></div>
+<footer class="cm">
+<i>// </i>Errata or suggestions? Open a <a href='https://github.com/JonahBraun/edges'>
+GitHub issue</a> or email <a href='mailto:Jonah@GoodCoffee.ca'>Jonah@GoodCoffee.ca</a>.
+</footer>
+</article>
+</body>
+</html>

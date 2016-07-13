@@ -1,0 +1,94 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Edges of Go</title>
+  <meta name="author" content="Jonah Braun">
+  <meta name="generator" content="bashfu">
+
+  <link rel="stylesheet" href="/style.css">
+	<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:300|Source+Sans+Pro' rel='stylesheet' type='text/css'>
+
+  <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+<article>
+
+<a id='header' href='/'><i>//</i>Edges┌─<br>
+<i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
+<div class="highlight"><pre><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;fmt&quot;</span>
+<span class="p">)</span>
+
+<span class="kd">type</span> <span class="nx">A</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">bar</span> <span class="kt">string</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">A</span><span class="p">)</span> <span class="nx">foo</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">B</span> <span class="nx">A</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="nx">B</span><span class="p">)</span> <span class="nx">foo</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;B&quot;</span><span class="p">)</span>
+
+	<span class="c1"><i>// </i>The first two don&#39;t work:</span>
+
+	<span class="c1">//b.A.foo()</span>
+	<span class="c1"><i>// </i>Error: b.A undefined (type B has no field or method A)</span>
+
+	<span class="c1">//B.A.foo()</span>
+	<span class="c1"><i>// </i>Error: B.A undefined (type B has no method A)</span>
+
+	<span class="c1"><i>// </i>But you can typecast it first:</span>
+	<span class="nx">A</span><span class="p">(</span><span class="nx">b</span><span class="p">).</span><span class="nx">foo</span><span class="p">()</span>
+
+	<span class="nx">b</span><span class="p">.</span><span class="nx">bar</span> <span class="p">=</span> <span class="s">&quot;bar b&quot;</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">bar</span><span class="p">)</span>
+
+	<span class="c1"><i>// </i>is a a clone of b?</span>
+	<span class="nx">a</span> <span class="o">:=</span> <span class="nx">A</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span>
+	<span class="nx">a</span><span class="p">.</span><span class="nx">bar</span> <span class="p">=</span> <span class="s">&quot;bar a&quot;</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">A</span><span class="p">(</span><span class="nx">b</span><span class="p">).</span><span class="nx">bar</span><span class="p">)</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">bar</span><span class="p">)</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">bar</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">C</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">A</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="nx">C</span><span class="p">)</span> <span class="nx">foo</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">)</span>
+
+	<span class="c1"><i>// </i>“When we embed a type, the methods of that type become methods of the outer type, but when they are invoked, the receiver of the method is the inner type, not the outer one.” - Effective Go</span>
+	<span class="c1"><i>// </i>Access embedded type</span>
+	<span class="nx">c</span><span class="p">.</span><span class="nx">A</span><span class="p">.</span><span class="nx">foo</span><span class="p">()</span>
+
+	<span class="c1"><i>// </i>Type casting does not work:</span>
+	<span class="c1">//A(c).foo()</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">b</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">B</span><span class="p">)</span>
+	<span class="nx">b</span><span class="p">.</span><span class="nx">foo</span><span class="p">()</span>
+
+	<span class="nx">c</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">C</span><span class="p">)</span>
+	<span class="nx">c</span><span class="p">.</span><span class="nx">foo</span><span class="p">()</span>
+<span class="p">}</span>
+</pre></div>
+<footer class="cm">
+<i>// </i>Errata or suggestions? Open a <a href='https://github.com/JonahBraun/edges'>
+GitHub issue</a> or email <a href='mailto:Jonah@GoodCoffee.ca'>Jonah@GoodCoffee.ca</a>.
+</footer>
+</article>
+</body>
+</html>

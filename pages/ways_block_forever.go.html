@@ -1,0 +1,97 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Edges of Go</title>
+  <meta name="author" content="Jonah Braun">
+  <meta name="generator" content="bashfu">
+
+  <link rel="stylesheet" href="/style.css">
+	<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:300|Source+Sans+Pro' rel='stylesheet' type='text/css'>
+
+  <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+<article>
+
+<a id='header' href='/'><i>//</i>Edges┌─<br>
+<i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
+<div class="highlight"><pre><span class="cm"><i>/*</i></span>
+<span class=><h1>Blocking Forever</h1></span>
+<span class="cm"><a href="https://play.golang.org/p/wNYrob63tp">https://play.golang.org/p/wNYrob63tp</a></span>
+
+<span class="cm">A go routine can be blocked from running, typically when waiting to send or</span>
+<span class="cm">receive on a channel. Here we explore all the ways to block forever…</span>
+
+<span class="cm">This script results in a deadlock. The dump for each channel will explain why</span>
+<span class="cm">the channel is blocked.</span>
+<span class="cm"><i>*/</i></span>
+
+<span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="s">&quot;runtime&quot;</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+
+	<span class="c1"><i>// </i>We will start with the obvious ones.</span>
+	<span class="c1"><i>// </i>Send on a channel with no receive.</span>
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="o">&lt;-</span><span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
+	<span class="p">}()</span>
+
+	<span class="c1"><i>// </i>Receive on a channel with no send.</span>
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
+	<span class="p">}()</span>
+
+	<span class="c1"><i>// </i>Send on a nil channel (the channel has not been initialized).</span>
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">a</span> <span class="kd">chan</span> <span class="kt">bool</span>
+		<span class="nx">a</span> <span class="o">&lt;-</span> <span class="kc">true</span>
+	<span class="p">}()</span>
+
+	<span class="c1"><i>// </i>Receive on a nil channel.</span>
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">a</span> <span class="kd">chan</span> <span class="kt">bool</span>
+		<span class="o">&lt;-</span><span class="nx">a</span>
+	<span class="p">}()</span>
+
+	<span class="c1"><i>// </i>Range on a nil channel.</span>
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">a</span> <span class="kd">chan</span> <span class="kt">bool</span>
+		<span class="k">for</span> <span class="k">range</span> <span class="nx">a</span> <span class="p">{</span>
+		<span class="p">}</span>
+	<span class="p">}()</span>
+
+	<span class="c1"><i>// </i>Select with only nil channels.</span>
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">a</span> <span class="kd">chan</span> <span class="kt">bool</span>
+		<span class="k">select</span> <span class="p">{</span>
+		<span class="k">case</span> <span class="nx">a</span> <span class="o">&lt;-</span> <span class="kc">true</span><span class="p">:</span>
+		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">a</span><span class="p">:</span>
+		<span class="p">}</span>
+	<span class="p">}()</span>
+
+	<span class="c1"><i>// </i>Here&#39;s my favorite so far, a simple one liner: the empty channel selector!</span>
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">select</span> <span class="p">{}</span>
+	<span class="p">}()</span>
+
+	<span class="c1"><i>// </i>To get some descriptive dumps, we cause the the current goroutine to exit,</span>
+	<span class="c1"><i>// </i>without exiting func main! This causes a fatal error because all</span>
+	<span class="c1"><i>// </i>go routines are asleep, never to be awoken from their eternal blocks.</span>
+	<span class="nx">runtime</span><span class="p">.</span><span class="nx">Goexit</span><span class="p">()</span>
+<span class="p">}</span>
+</pre></div>
+<footer class="cm">
+<i>// </i>Errata or suggestions? Open a <a href='https://github.com/JonahBraun/edges'>
+GitHub issue</a> or email <a href='mailto:Jonah@GoodCoffee.ca'>Jonah@GoodCoffee.ca</a>.
+</footer>
+</article>
+</body>
+</html>

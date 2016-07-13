@@ -1,0 +1,106 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Edges of Go</title>
+  <meta name="author" content="Jonah Braun">
+  <meta name="generator" content="bashfu">
+
+  <link rel="stylesheet" href="/style.css">
+	<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:300|Source+Sans+Pro' rel='stylesheet' type='text/css'>
+
+  <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+<article>
+
+<a id='header' href='/'><i>//</i>Edges┌─<br>
+<i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
+<div class="highlight"><pre><span class="c1"><i>// </i>Closing a channel is the only method of simulatenously communicating to</span>
+<span class="c1"><i>// </i>all listening goroutines</span>
+<span class="c1">//</span>
+<span class="c1"><i>// </i>Best line from the spec: <a href="https://golang.org/ref/spec#Send_statements">https://golang.org/ref/spec#Send_statements</a></span>
+<span class="c1"><i>// </i>&quot;A send on a closed channel proceeds by causing a run-time panic.&quot;</span>
+<span class="c1">//</span>
+<span class="c1"><i>// </i>This script purposely ends in a deadlock.</span>
+<span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;fmt&quot;</span>
+	<span class="s">&quot;sync&quot;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">c</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
+	<span class="kd">var</span> <span class="nx">wg</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span>
+	<span class="nx">wg</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
+		<span class="o">&lt;-</span><span class="nx">c</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;close a&quot;</span><span class="p">)</span>
+	<span class="p">}()</span>
+	<span class="c1"><i>// </i>pass the channel instead of enclose to demonostrate no magic</span>
+	<span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">c</span> <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
+		<span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
+		<span class="o">&lt;-</span><span class="nx">c</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;close c&quot;</span><span class="p">)</span>
+	<span class="p">}(</span><span class="nx">c</span><span class="p">)</span>
+
+	<span class="c1"><i>// </i>this sends the zero value of the channel</span>
+	<span class="nb">close</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+	<span class="nx">wg</span><span class="p">.</span><span class="nx">Wait</span><span class="p">()</span>
+
+	<span class="c1"><i>// </i>beware not to close again</span>
+	<span class="c1">//close(c)</span>
+	<span class="c1"><i>// </i>panic: close of closed channel</span>
+
+	<span class="c1"><i>// </i>but you can read from it again, as much as you like</span>
+	<span class="o">&lt;-</span><span class="nx">c</span>
+	<span class="o">&lt;-</span><span class="nx">c</span>
+
+	<span class="nx">c</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
+	<span class="nx">wg</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+	<span class="c1"><i>// </i>When doing this, do not test for a zero value to detect a close!</span>
+	<span class="c1"><i>// </i>Instead, use the comma-ok idiom</span>
+	<span class="c1"><i>// </i>the second boolean yields false for a nil or closed channel</span>
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
+		<span class="nx">_</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">c</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">ok</span><span class="p">)</span>
+	<span class="p">}()</span>
+	<span class="nb">close</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+
+	<span class="c1"><i>// </i>the above method is the only method doing this. A naïve approach of</span>
+	<span class="c1"><i>// </i>many routines listening to one channel does not work</span>
+
+	<span class="nx">s</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">string</span><span class="p">)</span>
+	<span class="nx">wg</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;First goroutine.&quot;</span><span class="p">,</span> <span class="o">&lt;-</span><span class="nx">s</span><span class="p">)</span>
+	<span class="p">}()</span>
+	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Second goroutine.&quot;</span><span class="p">,</span> <span class="o">&lt;-</span><span class="nx">s</span><span class="p">)</span>
+	<span class="p">}()</span>
+	<span class="nx">s</span> <span class="o">&lt;-</span> <span class="s">&quot;This will only print once&quot;</span>
+
+	<span class="c1"><i>// </i>We will wait in vain, this script ends in a fatal error</span>
+	<span class="nx">wg</span><span class="p">.</span><span class="nx">Wait</span><span class="p">()</span>
+	<span class="c1"><i>// </i>fatal error: all goroutines are asleep - deadlock!</span>
+<span class="p">}</span>
+</pre></div>
+<footer class="cm">
+<i>// </i>Errata or suggestions? Open a <a href='https://github.com/JonahBraun/edges'>
+GitHub issue</a> or email <a href='mailto:Jonah@GoodCoffee.ca'>Jonah@GoodCoffee.ca</a>.
+</footer>
+</article>
+</body>
+</html>
