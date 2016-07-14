@@ -21,17 +21,42 @@
 
 <a id='header' href='../'><i>//</i>Edges┌─<br>
 <i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
-<div class="highlight"><pre><span class="c1"><i>// </i>you can&#39;t return a send</span>
+<div class="highlight"><pre><span class="cm"><i>/*</i></span>
+<span class=><h1>Channel Sending is Second Class</h1></span>
+
+<span class="cm">Sending on a channel does not return a value (not even nil). This means it can</span>
+<span class="cm">not be assigned, passed or returned.</span>
+
+<span class="cm">This program does not compile.</span>
+<span class="cm"><i>*/</i></span>
+
 <span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="s">&quot;fmt&quot;</span>
 
+<span class="kd">func</span> <span class="nx">inspect</span><span class="p">(</span><span class="nx">v</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;%T %#v \n&quot;</span><span class="p">,</span> <span class="nx">v</span><span class="p">,</span> <span class="nx">v</span><span class="p">)</span>
+<span class="p">}</span>
+
 <span class="kd">func</span> <span class="nx">foo</span><span class="p">()</span> <span class="p">{</span>
 	<span class="nx">a</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">bool</span><span class="p">)</span>
+
+	<span class="c1"><i>// </i>Fail:</span>
+	<span class="nx">b</span> <span class="o">:=</span> <span class="nx">a</span><span class="o">&lt;-</span><span class="kc">true</span>
+	<span class="c1"><i>//= </i><output>a &lt;- true used as value</output></span>
+
+	<span class="c1"><i>// </i>Fail:</span>
+	<span class="nx">inspect</span><span class="p">(</span><span class="nx">a</span><span class="o">&lt;-</span><span class="kc">true</span><span class="p">)</span>
+	<span class="c1"><i>//= </i><output>a &lt;- true used as value</output></span>
+
+	<span class="c1"><i>// </i>Fail:</span>
 	<span class="k">return</span> <span class="nx">a</span><span class="o">&lt;-</span><span class="kc">true</span>
+	<span class="c1"><i>//= </i><output>a &lt;- true used as value</output></span>
+	<span class="c1"><i>//= </i><output>too many arguments to return</output></span>
 <span class="p">}</span>
+
 <span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
-	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">foo</span><span class="p">())</span>
+	<span class="nx">foo</span><span class="p">()</span>
 <span class="p">}</span>
 </pre></div>
 <footer class="cm">
