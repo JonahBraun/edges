@@ -21,9 +21,41 @@
 
 <a id='header' href='/'><i>//</i>Edges┌─<br>
 <i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
-<div class="highlight"><pre><span class="c1"><i>// </i>limitations:</span>
-<span class="c1"><i>// </i>fields are not methods (even if it is one) and so do not satisfy interface requirements</span>
+<div class="highlight"><pre><span class="cm"><i>/*</i></span>
+<span class=><h1>Limitations of Interfaces Without Fields</h1></span>
+<span class="cm"><i>*/</i></span>
+
 <span class="kn">package</span> <span class="nx">main</span>
+
+<span class="c1"><i>// </i>Interfaces in Go all you to specify expected behavior. Unfortunately, the interface</span>
+<span class="c1"><i>// </i>type can only specify functions, not fields.</span>
+
+<span class="c1"><i>// </i>This ommission is noticeable when considering that channels provide functionality!</span>
+<span class="c1"><i>// </i>They are quite similar to functions in that they can receive and return values.</span>
+
+<span class="kd">type</span> <span class="nx">Evented</span> <span class="kd">interface</span> <span class="p">{</span>
+	<span class="c1"><i>// </i>Regular method of an interface:</span>
+	<span class="nx">Broadcast</span><span class="p">()</span> <span class="kt">string</span>
+
+	<span class="c1"><i>// </i>Not allowed:</span>
+	<span class="c1"><b>//</b><code>Broadcast chan string</code></span>
+	<span class="c1"><i>//= </i><output>syntax error: unexpected chan, expecting semicolon, newline, or }</output></span>
+<span class="p">}</span>
+
+<span class="c1"><i>// </i>Closures (AKA anonymous functions, functions as values, first class functions)</span>
+<span class="c1"><i>// </i>are essential for functional programming. Closures are useful because they</span>
+<span class="c1"><i>// </i>encapsulate variables in scope at definition.</span>
+
+<span class="c1"><i>// </i>A struct can have function variables, but, unfortunately, this behavior can not</span>
+<span class="c1"><i>// </i>be exported in an abstract interfcase because interfaces can not have fields</span>
+<span class="c1"><i>// </i>— even when that field is a function!</span>
+
+<span class="kd">type</span> <span class="nx">Logger</span> <span class="kd">interface</span> <span class="p">{</span>
+
+	<span class="c1"><i>// </i>Can&#39;t have variables, even if they are a function definition. :/</span>
+	<span class="c1"><b>//</b><code>Log func(...interface{})</code></span>
+	<span class="c1"><i>//= </i><output>syntax error: unexpected chan, expecting semicolon, newline, or }</output></span>
+<span class="p">}</span>
 
 <span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
 <span class="p">}</span>

@@ -104,6 +104,12 @@ a#header, h1, h2 {
 i {
 	color: #eee;
 }
+b {
+	color: #000;
+	font-family: 'Source Code Pro', monospace;
+	font-weight: 300;
+	font-size: 14px;
+}
 
 p, .c1, .cm {
 	font-family: 'Source Sans Pro', sans-serif;
@@ -118,6 +124,13 @@ output{
 	font-weight: 300;
 	font-size: 14px;
 }
+code{
+	color: #408080;
+	font-family: 'Source Code Pro', monospace;
+	font-weight: 300;
+	font-size: 14px;
+}
+
 
 footer {
 	margin: 3em 0;
