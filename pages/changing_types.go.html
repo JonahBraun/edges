@@ -4,8 +4,9 @@
 <head>
   <meta charset="utf-8">
 
-  <title>Edges of Go</title>
+  <title>Changing Types</title>
   <meta name="author" content="Jonah Braun">
+  <link rel="license" href="https://creativecommons.org/licenses/by/3.0/">
   <meta name="generator" content="bashfu">
 
   <link rel="stylesheet" href="../style.css">
@@ -24,7 +25,6 @@
 <div class="highlight"><pre><span class="cm"><i>/*</i></span>
 <span class=><h1>Changing Types</h1></span>
 
-<span class="cm">Type conversion, casting and assertion.</span>
 <span class="cm"><i>*/</i></span>
 
 <span class="kn">package</span> <span class="nx">main</span>
@@ -54,7 +54,7 @@
 
 <span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
 
-	<span class="c1"><i>// </i># Conversion</span>
+	<span class=><h2><i>// </i># Conversion</h2></span>
 	<span class="c1"><i>// </i>Syntax: newType(var)</span>
 	<span class="c1"><i>// </i><a href="https://golang.org/doc/effective_go.html#conversions">https://golang.org/doc/effective_go.html#conversions</a></span>
 
@@ -74,10 +74,10 @@
 	<span class="c1"><i>// </i>Interface Conversion aka Type Assertion: var.(interfaceName)</span>
 	<span class="c1"><i>// </i><a href="https://golang.org/doc/effective_go.html#interface_conversions">https://golang.org/doc/effective_go.html#interface_conversions</a></span>
 	<span class="c1"><i>// </i>Type assertion can only be done on interfaces- that is, it can not be performed on a type.</span>
-	<span class="c1"><i>// </i>Interfaces can be obtained by declaring a func return as that interface</span>
+	<span class=><h2><i>// </i>Interfaces can be obtained by declaring a func return as that interface</h2></span>
 	<span class="c1"><i>// </i>or by declaring a variable to be that and then assigning a type to it.</span>
 
-	<span class="c1"><i>// </i>obtain an interface from a function and then covert it</span>
+	<span class=><h2><i>// </i>obtain an interface from a function and then covert it</h2></span>
 	<span class="nx">e</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Stringify</span><span class="p">()</span>
 	<span class="nx">f</span> <span class="o">:=</span> <span class="nx">e</span><span class="p">.(</span><span class="kd">interface</span><span class="p">{})</span>
 
@@ -87,11 +87,11 @@
 	<span class="nx">inspect</span><span class="p">(</span><span class="nx">g</span><span class="p">)</span>
 	<span class="nx">inspect</span><span class="p">(</span><span class="nx">g</span><span class="p">.(</span><span class="kd">interface</span><span class="p">{}))</span>
 
-	<span class="c1"><i>// </i>Type Switch</span>
+	<span class=><h2><i>// </i>Type Switch</h2></span>
 	<span class="c1"><i>// </i>A special type of type assertion, can only be used on interfaces!</span>
 	<span class="c1"><i>// </i><a href="https://golang.org/doc/effective_go.html#type_switch">https://golang.org/doc/effective_go.html#type_switch</a></span>
 	<span class="c1"><i>// </i>First case that matches is used, below both fmt.Stringer and interface{} will match,</span>
-	<span class="c1"><i>// </i>but &quot;stringer&quot; is printed</span>
+	<span class=><h2><i>// </i>but &quot;stringer&quot; is printed</h2></span>
 	<span class="k">switch</span> <span class="nx">f</span> <span class="o">:=</span> <span class="nx">f</span><span class="p">.(</span><span class="kd">type</span><span class="p">)</span> <span class="p">{</span>
 	<span class="k">case</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Stringer</span><span class="p">:</span>
 		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;stringer&quot;</span><span class="p">,</span> <span class="nx">f</span><span class="p">)</span>
@@ -101,12 +101,11 @@
 		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;throw an error or something&quot;</span><span class="p">)</span>
 	<span class="p">}</span>
 
-	<span class="c1"><i>// </i>function types act a lot like interfaces</span>
+	<span class=><h2><i>// </i>function types act a lot like interfaces</h2></span>
 <span class="p">}</span>
 </pre></div>
 <footer class="cm">
-<i>// </i>Errata or suggestions? Open a <a href='https://github.com/JonahBraun/edges'>
-GitHub issue</a> or email <a href='mailto:Jonah@GoodCoffee.ca'>Jonah@GoodCoffee.ca</a>.
+<i>// </i><a href='Type conversion, casting and assertion.'>Comments Page</a>
 </footer>
 </article>
 </body>

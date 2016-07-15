@@ -4,8 +4,9 @@
 <head>
   <meta charset="utf-8">
 
-  <title>Edges of Go</title>
+  <title>Variable Encapsulation of Closures</title>
   <meta name="author" content="Jonah Braun">
+  <link rel="license" href="https://creativecommons.org/licenses/by/3.0/">
   <meta name="generator" content="bashfu">
 
   <link rel="stylesheet" href="../style.css">
@@ -22,77 +23,98 @@
 <a id='header' href='../'><i>//</i>Edges┌─<br>
 <i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
 <div class="highlight"><pre><span class="cm"><i>/*</i></span>
-<span class=><h1>The Variable Encapsulation of Closures</h1></span>
+<span class=><h1>Variable Encapsulation of Closures</h1></span>
+<span class="cm"><a href="https://play.golang.org/p/mM2rOkI4-n">https://play.golang.org/p/mM2rOkI4-n</a></span>
 
-<span class="cm">Exploring how variables are enclosed by anonymous functions.</span>
-
-<span class="cm">Closures enclose the vars available at declaration and not at call time. To obtain</span>
-<span class="cm">call time vars, pass parameters.</span>
+<span class="cm">Closures enclose variables at declaration and not at call time.</span>
+<span class="cm">To obtain call time vars, pass parameters.</span>
 <span class="cm"><i>*/</i></span>
+
 <span class="kn">package</span> <span class="nx">main</span>
 
+<span class="c1"><i>// </i>Use log to print file numbers to make output easier to understand.</span>
 <span class="kn">import</span> <span class="s">&quot;log&quot;</span>
 
 <span class="kd">var</span> <span class="nx">foo</span> <span class="p">=</span> <span class="s">&quot;outside&quot;</span>
-<span class="kd">var</span> <span class="nx">A</span> <span class="p">=</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+
+<span class="c1"><i>// </i>Our first closure. It prints the previous declared foo.</span>
+<span class="kd">var</span> <span class="nx">printFoo</span> <span class="p">=</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
 	<span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span>
 <span class="p">}</span>
 
+<span class="c1"><i>// </i>A closure factory, this produces functions that prints both the outside foo and</span>
+<span class="c1"><i>// </i>whatever string is passed when creating the new function.</span>
 <span class="kd">func</span> <span class="nx">factory</span><span class="p">(</span><span class="nx">a</span> <span class="kt">string</span><span class="p">)</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
 	<span class="k">return</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-		<span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
+		<span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">foo</span><span class="p">,</span> <span class="nx">a</span><span class="p">)</span>
 	<span class="p">}</span>
 <span class="p">}</span>
 
 <span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1"><i>// </i>Set up log to print file line numbers.</span>
 	<span class="nx">log</span><span class="p">.</span><span class="nx">SetFlags</span><span class="p">(</span><span class="nx">log</span><span class="p">.</span><span class="nx">Lshortfile</span><span class="p">)</span>
 
-	<span class="nx">foo</span> <span class="p">=</span> <span class="s">&quot;main&quot;</span>
-	<span class="nx">A</span><span class="p">()</span>
-	<span class="c1"><i>//= </i><output>main</output></span>
+	<span class="c1"><i>// </i>As expected.</span>
+	<span class="nx">printFoo</span><span class="p">()</span>
+	<span class="c1"><i>//= </i><output>outside</output></span>
 
-	<span class="c1"><i>// </i>foo is shadowed next while A() enclosed the outside foo</span>
-	<span class="nx">foo</span> <span class="o">:=</span> <span class="s">&quot;main 2&quot;</span>
-	<span class="nx">A</span><span class="p">()</span>
-	<span class="c1"><i>//= </i><output>main</output></span>
+	<span class="c1"><i>// </i>We can change the global variable foo. printFoo() references the</span>
+	<span class="c1"><i>// </i>global variable foo (the variable in scope at decleration).</span>
+	<span class="nx">foo</span> <span class="p">=</span> <span class="s">&quot;changed&quot;</span>
+	<span class="nx">printFoo</span><span class="p">()</span>
+	<span class="c1"><i>//= </i><output>changed</output></span>
 
+	<span class="c1"><i>// </i>We create a new foo that shadows the global foo.</span>
+	<span class="nx">foo</span> <span class="o">:=</span> <span class="s">&quot;foo B&quot;</span>
 	<span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span>
-	<span class="c1"><i>//= </i><output>main 2</output></span>
+	<span class="c1"><i>//= </i><output>foo B</output></span>
 
+	<span class="c1"><i>// </i>printFoo() continues to reference the global foo.</span>
+	<span class="nx">printFoo</span><span class="p">()</span>
+	<span class="c1"><i>//= </i><output>changed</output></span>
+
+	<span class="c1"><i>// </i>This closure is immediately executed. It prints the foo in scope now.</span>
 	<span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
 		<span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span>
-		<span class="c1"><i>//= </i><output>main 2</output></span>
+		<span class="c1"><i>//= </i><output>foo B</output></span>
 	<span class="p">}()</span>
 
+	<span class="c1"><i>// </i>Let&#39;s declare a new printFoo(), and call it B. Just like the pervious closure,</span>
+	<span class="c1"><i>// </i>it refers to the foo currently in scope.</span>
 	<span class="nx">B</span> <span class="o">:=</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
 		<span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span>
 	<span class="p">}</span>
 
 	<span class="nx">B</span><span class="p">()</span>
-	<span class="c1"><i>//= </i><output>main 2</output></span>
+	<span class="c1"><i>//= </i><output>foo B</output></span>
 
-	<span class="nx">foo</span> <span class="p">=</span> <span class="s">&quot;main 3&quot;</span>
+	<span class="c1"><i>// </i>We can change foo, and see the results</span>
+	<span class="nx">foo</span> <span class="p">=</span> <span class="s">&quot;foo B changed&quot;</span>
 	<span class="nx">B</span><span class="p">()</span>
-	<span class="c1"><i>//= </i><output>main 3</output></span>
+	<span class="c1"><i>//= </i><output>foo B changed</output></span>
 
-	<span class="nx">a</span> <span class="o">:=</span> <span class="s">&quot;a string&quot;</span>
+	<span class=><h2><i>// </i>Putting it Together</h2></span>
+
+	<span class="c1"><i>// </i>Let&#39;s use our factory next.</span>
+	<span class="nx">a</span> <span class="o">:=</span> <span class="s">&quot;Paramastring&quot;</span>
 	<span class="nx">fA</span> <span class="o">:=</span> <span class="nx">factory</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
-	<span class="nx">fA</span><span class="p">()</span>
-	<span class="c1"><i>//= </i><output>a string</output></span>
 
-	<span class="nx">a</span> <span class="p">=</span> <span class="s">&quot;b string&quot;</span>
+	<span class="c1"><i>// </i>This references the original global foo and the recently passed variable.</span>
 	<span class="nx">fA</span><span class="p">()</span>
-	<span class="c1"><i>//= </i><output>a string</output></span>
+	<span class="c1"><i>//= </i><output>changed Paramastring</output></span>
 
-	<span class="kd">func</span><span class="p">(</span><span class="nx">a</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-		<span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
-	<span class="p">}(</span><span class="s">&quot;new string&quot;</span><span class="p">)</span>
-	<span class="c1"><i>//= </i><output>new string</output></span>
+	<span class="c1"><i>// </i>We can change the variable we passed, but it was passed by copy (not by reference)</span>
+	<span class="c1"><i>// </i>and so still has the original value.</span>
+	<span class="nx">a</span> <span class="p">=</span> <span class="s">&quot;Never Printed&quot;</span>
+	<span class="nx">fA</span><span class="p">()</span>
+	<span class="c1"><i>//= </i><output>changed Paramastring</output></span>
+
+	<span class="c1"><i>// </i>To explore further, try changing factory() to take a string pointer (*string)</span>
+	<span class="c1"><i>// </i>Because it holds the pointer, you will be able to change the value after declaration.</span>
 <span class="p">}</span>
 </pre></div>
 <footer class="cm">
-<i>// </i>Errata or suggestions? Open a <a href='https://github.com/JonahBraun/edges'>
-GitHub issue</a> or email <a href='mailto:Jonah@GoodCoffee.ca'>Jonah@GoodCoffee.ca</a>.
+<i>// </i><a href='https://github.com/JonahBraun/edges/issues/1'>Comments Page</a>
 </footer>
 </article>
 </body>

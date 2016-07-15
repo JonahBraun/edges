@@ -4,8 +4,9 @@
 <head>
   <meta charset="utf-8">
 
-  <title>Edges of Go</title>
+  <title>Limitations of Interfaces Without Fields</title>
   <meta name="author" content="Jonah Braun">
+  <link rel="license" href="https://creativecommons.org/licenses/by/3.0/">
   <meta name="generator" content="bashfu">
 
   <link rel="stylesheet" href="../style.css">
@@ -24,31 +25,44 @@
 <div class="highlight"><pre><span class="cm"><i>/*</i></span>
 <span class=><h1>Limitations of Interfaces Without Fields</h1></span>
 <span class="cm"><i>*/</i></span>
-
 <span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="s">&quot;fmt&quot;</span>
 
 <span class="c1"><i>// </i>Interfaces in Go all you to specify expected behavior. Unfortunately, the interface</span>
 <span class="c1"><i>// </i>type can only specify functions, not fields.</span>
 
 <span class="c1"><i>// </i>This ommission is noticeable when considering that channels provide functionality!</span>
 <span class="c1"><i>// </i>They are quite similar to functions in that they can receive and return values.</span>
+<span class="c1"><i>// </i>For example, consider an interface for broadcasting events. The sender doesn&#39;t</span>
+<span class="c1"><i>// </i>care about a succesful return, a simple channel is all that is necessary.</span>
 
 <span class="kd">type</span> <span class="nx">Evented</span> <span class="kd">interface</span> <span class="p">{</span>
 	<span class="c1"><i>// </i>Regular method of an interface:</span>
 	<span class="nx">Broadcast</span><span class="p">()</span> <span class="kt">string</span>
 
 	<span class="c1"><i>// </i>Not allowed:</span>
-	<span class="c1"><b>//</b><code>Broadcast chan string</code></span>
+	<span class=><h2><b>//</b><code>Broadcast chan string</h2></code></span>
 	<span class="c1"><i>//= </i><output>syntax error: unexpected chan, expecting semicolon, newline, or }</output></span>
 <span class="p">}</span>
+
+<span class="c1"><i>// </i>A real world example is the fsnotify library: <a href="https://github.com/howeyc/fsnotify">https://github.com/howeyc/fsnotify</a></span>
+<span class="c1"><i>// </i>It makes two channels available to listen to events on. This behavior implementation</span>
+<span class="c1"><i>// </i>is impossible to abstract as an interface. The work around is to write extraneous</span>
+<span class="c1"><i>// </i>getter functions.</span>
+
+<span class="kd">type</span> <span class="nx">FSNotify</span> <span class="kd">interface</span> <span class="p">{</span>
+	<span class="nx">Event</span><span class="p">()</span> <span class="p">(</span><span class="nx">Event</span> <span class="kd">chan</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Stringer</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class=><h2><i>// </i>Closures</h2></span>
 
 <span class="c1"><i>// </i>Closures (AKA anonymous functions, functions as values, first class functions)</span>
 <span class="c1"><i>// </i>are essential for functional programming. Closures are useful because they</span>
 <span class="c1"><i>// </i>encapsulate variables in scope at definition.</span>
 
-<span class="c1"><i>// </i>A struct can have function variables, but, unfortunately, this behavior can not</span>
-<span class="c1"><i>// </i>be exported in an abstract interfcase because interfaces can not have fields</span>
-<span class="c1"><i>// </i>— even when that field is a function!</span>
+<span class="c1"><i>// </i>A struct can have function variables, but although functions, these are still</span>
+<span class="c1"><i>// </i>variables and so can not constitute an interface.</span>
 
 <span class="kd">type</span> <span class="nx">Logger</span> <span class="kd">interface</span> <span class="p">{</span>
 
@@ -61,8 +75,7 @@
 <span class="p">}</span>
 </pre></div>
 <footer class="cm">
-<i>// </i>Errata or suggestions? Open a <a href='https://github.com/JonahBraun/edges'>
-GitHub issue</a> or email <a href='mailto:Jonah@GoodCoffee.ca'>Jonah@GoodCoffee.ca</a>.
+<i>// </i><a href=''>Comments Page</a>
 </footer>
 </article>
 </body>

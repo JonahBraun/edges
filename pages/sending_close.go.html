@@ -4,8 +4,9 @@
 <head>
   <meta charset="utf-8">
 
-  <title>Edges of Go</title>
+  <title>// all listening goroutines</title>
   <meta name="author" content="Jonah Braun">
+  <link rel="license" href="https://creativecommons.org/licenses/by/3.0/">
   <meta name="generator" content="bashfu">
 
   <link rel="stylesheet" href="../style.css">
@@ -21,12 +22,11 @@
 
 <a id='header' href='../'><i>//</i>Edges┌─<br>
 <i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
-<div class="highlight"><pre><span class="c1"><i>// </i>Closing a channel is the only method of simulatenously communicating to</span>
-<span class="c1"><i>// </i>all listening goroutines</span>
-<span class="c1">//</span>
-<span class="c1"><i>// </i>Best line from the spec: <a href="https://golang.org/ref/spec#Send_statements">https://golang.org/ref/spec#Send_statements</a></span>
+<div class="highlight"><pre><span class=><h2><i>// </i>Closing a channel is the only method of simulatenously communicating to</h2></span>
+<span class=><h2><i>// </i>all listening goroutines</h2></span>
+<span class=><h2>//</h2></span>
 <span class="c1"><i>// </i>&quot;A send on a closed channel proceeds by causing a run-time panic.&quot;</span>
-<span class="c1">//</span>
+<span class=><h2>//</h2></span>
 <span class="c1"><i>// </i>This script purposely ends in a deadlock.</span>
 <span class="kn">package</span> <span class="nx">main</span>
 
@@ -45,19 +45,19 @@
 		<span class="o">&lt;-</span><span class="nx">c</span>
 		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;close a&quot;</span><span class="p">)</span>
 	<span class="p">}()</span>
-	<span class="c1"><i>// </i>pass the channel instead of enclose to demonostrate no magic</span>
+	<span class=><h2><i>// </i>pass the channel instead of enclose to demonostrate no magic</h2></span>
 	<span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">c</span> <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
 		<span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
 		<span class="o">&lt;-</span><span class="nx">c</span>
 		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;close c&quot;</span><span class="p">)</span>
 	<span class="p">}(</span><span class="nx">c</span><span class="p">)</span>
 
-	<span class="c1"><i>// </i>this sends the zero value of the channel</span>
+	<span class=><h2><i>// </i>this sends the zero value of the channel</h2></span>
 	<span class="nb">close</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
 	<span class="nx">wg</span><span class="p">.</span><span class="nx">Wait</span><span class="p">()</span>
 
-	<span class="c1"><i>// </i>beware not to close again</span>
-	<span class="c1"><b>//</b><code>close(c)</code></span>
+	<span class=><h2><i>// </i>beware not to close again</h2></span>
+	<span class=><h2><b>//</b><code>close(c)</h2></code></span>
 	<span class="c1"><i>// </i>panic: close of closed channel</span>
 
 	<span class="c1"><i>// </i>but you can read from it again, as much as you like</span>
@@ -68,7 +68,7 @@
 	<span class="nx">wg</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 	<span class="c1"><i>// </i>When doing this, do not test for a zero value to detect a close!</span>
 	<span class="c1"><i>// </i>Instead, use the comma-ok idiom</span>
-	<span class="c1"><i>// </i>the second boolean yields false for a nil or closed channel</span>
+	<span class=><h2><i>// </i>the second boolean yields false for a nil or closed channel</h2></span>
 	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
 		<span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
 		<span class="nx">_</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">c</span>
@@ -77,7 +77,7 @@
 	<span class="nb">close</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
 
 	<span class="c1"><i>// </i>the above method is the only method doing this. A naïve approach of</span>
-	<span class="c1"><i>// </i>many routines listening to one channel does not work</span>
+	<span class=><h2><i>// </i>many routines listening to one channel does not work</h2></span>
 
 	<span class="nx">s</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">string</span><span class="p">)</span>
 	<span class="nx">wg</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -98,8 +98,7 @@
 <span class="p">}</span>
 </pre></div>
 <footer class="cm">
-<i>// </i>Errata or suggestions? Open a <a href='https://github.com/JonahBraun/edges'>
-GitHub issue</a> or email <a href='mailto:Jonah@GoodCoffee.ca'>Jonah@GoodCoffee.ca</a>.
+<i>// </i><a href='// Best line from the spec: https://golang.org/ref/spec#Send_statements'>Comments Page</a>
 </footer>
 </article>
 </body>
