@@ -2,6 +2,9 @@
 
 # Converts Go source code to annotated HTML
 
+# This prototype is reaching it's limits and could be replaced with a real
+# static site generator.
+
 set -euo pipefail
 IFS=$'\n\t'
 
@@ -28,13 +31,13 @@ for f in $(ls src); do
 	cat src/$f \
 		| sed '4d' \
 		| pygmentize -l go -f html \
-		| sed 's%"cm">\([^:?!/=,.]*\)<%><h1>\1</h1><%' \
-		| sed 's%"c1">\([^:?!=,.]*\)<%><h2>\1</h2><%' \
+		| sed 's%"cm">\([^:?!/=,.\-]*\)<%><h1>\1</h1><%' \
+		| sed 's%"c1">\([^:?!=,.\-]*\)<%><h2>\1</h2><%' \
 		| sed 's%>\(// \)%><i>\1</i>%' \
 		| sed 's%>\(//= \)\(.*\)<%><i>\1</i><output>\2</output><%' \
 		| sed 's%>\(//\)\(\w.*\)<%><b>\1</b><code>\2</code><%' \
-		| sed 's%>\(/\*\)%><i>\1</i>%' \
-		| sed 's%>\(\*/\)%><i>\1</i>%' \
+		| sed 's%>\(\s*/\*\)%><i>\1</i>%' \
+		| sed 's%>\(\s*\*/\)%><i>\1</i>%' \
 		| sed 's%\(http.*\)<%<a href="\1">\1</a><%' \
 		>> pages/$out
 	# Did you catch that? I just manipulated HTML with regex, what terrible practice!
