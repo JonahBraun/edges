@@ -1,5 +1,7 @@
 /*
 Channel of Nil
+https://github.com/JonahBraun/edges/issues
+https://github.com/JonahBraun/edges/issues
 
 You can have nil channels (a channel not yet initialized), and then you can have
 an initialized, working channel of nil. This demonstrates the latter.

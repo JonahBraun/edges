@@ -24,6 +24,9 @@
 <i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
 <div class="highlight"><pre><span class="cm"><i>/*</i></span>
 <span class=><h1>Changing Types</h1></span>
+<span class="cm"><a href="https://github.com/JonahBraun/edges/issues">https://github.com/JonahBraun/edges/issues</a></span>
+
+<span class="cm">The different ways a type can be changed in Go.</span>
 
 <span class="cm"><i>*/</i></span>
 
@@ -31,12 +34,9 @@
 
 <span class="kn">import</span> <span class="p">(</span>
 	<span class="s">&quot;fmt&quot;</span>
+	<span class="s">&quot;log&quot;</span>
 	<span class="s">&quot;strconv&quot;</span>
 <span class="p">)</span>
-
-<span class="kd">func</span> <span class="nx">inspect</span><span class="p">(</span><span class="nx">v</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
-	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;%T %#v \n&quot;</span><span class="p">,</span> <span class="nx">v</span><span class="p">,</span> <span class="nx">v</span><span class="p">)</span>
-<span class="p">}</span>
 
 <span class="kd">type</span> <span class="nx">flint</span> <span class="kt">int</span>
 
@@ -54,31 +54,38 @@
 
 <span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
 
-	<span class=><h2><i>// </i># Conversion</h2></span>
+	<span class=><h2><i>// </i>Type Conversion</h2></span>
 	<span class="c1"><i>// </i>Syntax: newType(var)</span>
 	<span class="c1"><i>// </i><a href="https://golang.org/doc/effective_go.html#conversions">https://golang.org/doc/effective_go.html#conversions</a></span>
 
-	<span class="c1"><i>// </i>Type conversion changes the underlying value. In other languages</span>
-	<span class="c1"><i>// </i>this is called type casting.</span>
+	<span class="c1"><i>// </i>Type conversion changes the type and possibly the underlying value. In other</span>
+	<span class="c1"><i>// </i>languages this is called type casting.</span>
 	<span class="nx">a</span> <span class="o">:=</span> <span class="mf">6.4</span>
 	<span class="nx">inspect</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
+	<span class="c1"><i>//= </i><output>float64 6.4</output></span>
+
 	<span class="nx">b</span> <span class="o">:=</span> <span class="nb">int</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
 	<span class="nx">inspect</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span>
+	<span class="c1"><i>//= </i><output>int 6</output></span>
 
-	<span class="c1"><i>// </i>Type conversion, no underlying change</span>
+	<span class="c1"><i>// </i>Type conversion can be used to change from custom to native types.</span>
 	<span class="nx">c</span> <span class="o">:=</span> <span class="nx">flint</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 	<span class="nx">inspect</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+	<span class="c1"><i>//= </i><output>main.flint 4</output></span>
+
 	<span class="nx">d</span> <span class="o">:=</span> <span class="nb">int</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
 	<span class="nx">inspect</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span>
+	<span class="c1"><i>//= </i><output>int 4</output></span>
 
-	<span class="c1"><i>// </i>Interface Conversion aka Type Assertion: var.(interfaceName)</span>
+	<span class=><h2><i>// </i>Type Assertion (Interface Conversion)</h2></span>
+	<span class="c1"><i>// </i>Sytnax: var.(interfaceName)</span>
 	<span class="c1"><i>// </i><a href="https://golang.org/doc/effective_go.html#interface_conversions">https://golang.org/doc/effective_go.html#interface_conversions</a></span>
-	<span class="c1"><i>// </i>Type assertion can only be done on interfaces- that is, it can not be performed on a type.</span>
-	<span class=><h2><i>// </i>Interfaces can be obtained by declaring a func return as that interface</h2></span>
-	<span class="c1"><i>// </i>or by declaring a variable to be that and then assigning a type to it.</span>
 
+	<span class="c1"><i>// </i>Type assertion can only be performed on the interface type.</span>
 	<span class=><h2><i>// </i>obtain an interface from a function and then covert it</h2></span>
-	<span class="nx">e</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Stringify</span><span class="p">()</span>
+	<span class="kd">var</span> <span class="nx">e</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Stringer</span> <span class="p">=</span> <span class="nx">c</span>
+	<span class="c1"><b>//</b><code>e := c.Stringify()</code></span>
+	<span class="nx">inspect</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span>
 	<span class="nx">f</span> <span class="o">:=</span> <span class="nx">e</span><span class="p">.(</span><span class="kd">interface</span><span class="p">{})</span>
 
 	<span class="c1"><i>// </i>declare an interface, assign to it and then convert it</span>
@@ -103,9 +110,19 @@
 
 	<span class=><h2><i>// </i>function types act a lot like interfaces</h2></span>
 <span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">init</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1"><i>// </i>Set up log to print file line numbers.</span>
+	<span class="nx">log</span><span class="p">.</span><span class="nx">SetFlags</span><span class="p">(</span><span class="nx">log</span><span class="p">.</span><span class="nx">Lshortfile</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1"><i>// </i>This convenience function prints a Go representation of the type and value.</span>
+<span class="kd">func</span> <span class="nx">inspect</span><span class="p">(</span><span class="nx">v</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+	<span class="nx">log</span><span class="p">.</span><span class="nx">Output</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="s">&quot;%T %#v \n&quot;</span><span class="p">,</span> <span class="nx">v</span><span class="p">,</span> <span class="nx">v</span><span class="p">))</span>
+<span class="p">}</span>
 </pre></div>
 <footer class="cm">
-<i>// </i><a href='Type conversion, casting and assertion.'>Comments Page</a>
+<i>// </i><a href='https://github.com/JonahBraun/edges/issues'>Comments Page</a>
 </footer>
 </article>
 </body>

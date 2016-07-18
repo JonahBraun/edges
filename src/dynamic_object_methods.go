@@ -1,5 +1,7 @@
 /*
 Limitations of Interfaces Without Fields
+https://github.com/JonahBraun/edges/issues
+https://github.com/JonahBraun/edges/issues
 */
 
 package main

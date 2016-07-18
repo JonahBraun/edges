@@ -1,19 +1,19 @@
 /*
 Changing Types
+https://github.com/JonahBraun/edges/issues
+https://github.com/JonahBraun/edges/issues
 
-Type conversion, casting and assertion.
+The different ways a type can be changed in Go.
+
 */
 
 package main
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 )
-
-func inspect(v interface{}) {
-	fmt.Printf("%T %#v \n", v, v)
-}
 
 type flint int
 
@@ -31,31 +31,38 @@ func (f flint) Interfacify() interface{} {
 
 func main() {
 
-	// # Conversion
+	// Type Conversion
 	// Syntax: newType(var)
 	// https://golang.org/doc/effective_go.html#conversions
 
-	// Type conversion changes the underlying value. In other languages
-	// this is called type casting.
+	// Type conversion changes the type and possibly the underlying value. In other
+	// languages this is called type casting.
 	a := 6.4
 	inspect(a)
+	//= float64 6.4
+
 	b := int(a)
 	inspect(b)
+	//= int 6
 
-	// Type conversion, no underlying change
+	// Type conversion can be used to change from custom to native types.
 	c := flint(4)
 	inspect(c)
+	//= main.flint 4
+
 	d := int(c)
 	inspect(d)
+	//= int 4
 
-	// Interface Conversion aka Type Assertion: var.(interfaceName)
+	// Type Assertion (Interface Conversion)
+	// Sytnax: var.(interfaceName)
 	// https://golang.org/doc/effective_go.html#interface_conversions
-	// Type assertion can only be done on interfaces- that is, it can not be performed on a type.
-	// Interfaces can be obtained by declaring a func return as that interface
-	// or by declaring a variable to be that and then assigning a type to it.
 
+	// Type assertion can only be performed on the interface type.
 	// obtain an interface from a function and then covert it
-	e := c.Stringify()
+	var e fmt.Stringer = c
+	//e := c.Stringify()
+	inspect(e)
 	f := e.(interface{})
 
 	// declare an interface, assign to it and then convert it
@@ -79,4 +86,14 @@ func main() {
 	}
 
 	// function types act a lot like interfaces
+}
+
+func init() {
+	// Set up log to print file line numbers.
+	log.SetFlags(log.Lshortfile)
+}
+
+// This convenience function prints a Go representation of the type and value.
+func inspect(v interface{}) {
+	log.Output(2, fmt.Sprintf("%T %#v \n", v, v))
 }

@@ -1,5 +1,7 @@
 /*
 Channel Sending is Second Class
+https://github.com/JonahBraun/edges/issues
+https://github.com/JonahBraun/edges/issues
 
 Sending on a channel does not return a value (not even nil). This means it can
 not be assigned, passed or returned.

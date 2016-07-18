@@ -1,5 +1,7 @@
 /*
 Checking If A Channel Is Ready
+https://github.com/JonahBraun/edges/issues
+https://github.com/JonahBraun/edges/issues
 
 Use a
 */

@@ -1,3 +1,8 @@
+/*
+Title
+https://github.com/JonahBraun/edges/issues
+https://github.com/JonahBraun/edges/issues
+*/
 // Closing a channel is the only method of simulatenously communicating to
 // all listening goroutines
 //

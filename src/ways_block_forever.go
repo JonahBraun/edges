@@ -1,6 +1,7 @@
 /*
 Blocking Forever
-https://play.golang.org/p/wNYrob63tp
+https://github.com/JonahBraun/edges/issues
+https://github.com/JonahBraun/edges/issues
 
 A go routine can be blocked from running, typically when waiting to send or
 receive on a channel. Here we explore all the ways to block forever…

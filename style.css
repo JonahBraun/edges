@@ -105,9 +105,15 @@ a#header, h1, h2 {
 	font-family: 'Source Sans Pro', sans-serif;
 	font-weight: 400;
 	font-size: 2em;
+	white-space: normal;
+}
+.cm {
+	white-space: normal;
 }
 i {
-	color: #eee;
+	display: inline-block;
+	color: #fff;
+	width: 0;
 }
 b {
 	color: #000;
@@ -123,7 +129,10 @@ p, .c1, .cm {
 }
 output{
 	display: inline-block;
-	padding: 0 .2em;
+	width: 100%;
+	overflow: hidden;
+
+	padding: .2em;
 	background: hsl(0, 0%, 94%);
 	font-family: 'Source Code Pro', monospace;
 	font-weight: 300;
