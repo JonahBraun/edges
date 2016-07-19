@@ -22,12 +22,12 @@
 
 <a id='header' href='../'><i>//</i>Edges┌─<br>
 <i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
+Status: <span style='background: #fbb'>Alpha</span>
 <div class="highlight"><pre><span class="cm"><i>/*</i></span>
 <span class=><h1>Changing Types</h1></span>
 <span class="cm"><a href="https://github.com/JonahBraun/edges/issues">https://github.com/JonahBraun/edges/issues</a></span>
 
 <span class="cm">The different ways a type can be changed in Go.</span>
-
 <span class="cm"><i>*/</i></span>
 
 <span class="kn">package</span> <span class="nx">main</span>
@@ -44,12 +44,12 @@
 	<span class="k">return</span> <span class="nx">strconv</span><span class="p">.</span><span class="nx">Itoa</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nx">f</span><span class="p">))</span>
 <span class="p">}</span>
 
-<span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="nx">flint</span><span class="p">)</span> <span class="nx">Stringify</span><span class="p">()</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Stringer</span> <span class="p">{</span>
-	<span class="k">return</span> <span class="nx">f</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="nx">flint</span><span class="p">)</span> <span class="nx">Foo</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Foo!&quot;</span><span class="p">)</span>
 <span class="p">}</span>
 
-<span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="nx">flint</span><span class="p">)</span> <span class="nx">Interfacify</span><span class="p">()</span> <span class="kd">interface</span><span class="p">{}</span> <span class="p">{</span>
-	<span class="k">return</span> <span class="nx">f</span>
+<span class="kd">type</span> <span class="nx">FooBar</span> <span class="kd">interface</span> <span class="p">{</span>
+	<span class="nx">Foo</span><span class="p">()</span>
 <span class="p">}</span>
 
 <span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
@@ -82,33 +82,39 @@
 	<span class="c1"><i>// </i><a href="https://golang.org/doc/effective_go.html#interface_conversions">https://golang.org/doc/effective_go.html#interface_conversions</a></span>
 
 	<span class="c1"><i>// </i>Type assertion can only be performed on the interface type.</span>
-	<span class=><h2><i>// </i>obtain an interface from a function and then covert it</h2></span>
+	<span class="c1"><i>// </i>First we declare a fmt.Stringer interface variable, then assign to it.</span>
 	<span class="kd">var</span> <span class="nx">e</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Stringer</span> <span class="p">=</span> <span class="nx">c</span>
-	<span class="c1"><b>//</b><code>e := c.Stringify()</code></span>
+	<span class="c1"><i>// </i>Note the underlying type and value do not change. Interfaces only declare a</span>
+	<span class="c1"><i>// </i>set of functions, not the type or contents.</span>
 	<span class="nx">inspect</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span>
-	<span class="nx">f</span> <span class="o">:=</span> <span class="nx">e</span><span class="p">.(</span><span class="kd">interface</span><span class="p">{})</span>
+	<span class="c1"><i>//= </i><output>main.flint 4</output></span>
 
-	<span class="c1"><i>// </i>declare an interface, assign to it and then convert it</span>
-	<span class="kd">var</span> <span class="nx">g</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Stringer</span>
-	<span class="nx">g</span> <span class="p">=</span> <span class="nx">c</span>
-	<span class="nx">inspect</span><span class="p">(</span><span class="nx">g</span><span class="p">)</span>
-	<span class="nx">inspect</span><span class="p">(</span><span class="nx">g</span><span class="p">.(</span><span class="kd">interface</span><span class="p">{}))</span>
+	<span class="c1"><i>// </i>We can convert the interface to another interface, since the underlying type</span>
+	<span class="c1"><i>// </i>and value is not changing, all we are really doing is asserting that the variable</span>
+	<span class="c1"><i>// </i>has a certain type. We can do this since our flint type has the Foo() function</span>
+	<span class="c1"><i>// </i>required for the FooBar interface.</span>
+	<span class="nx">f</span> <span class="o">:=</span> <span class="nx">e</span><span class="p">.(</span><span class="nx">FooBar</span><span class="p">)</span>
+
+	<span class="c1"><i>// </i>Again, the type and value have not changed.</span>
+	<span class="nx">inspect</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span>
+	<span class="c1"><i>//= </i><output>main.flint 4</output></span>
 
 	<span class=><h2><i>// </i>Type Switch</h2></span>
-	<span class="c1"><i>// </i>A special type of type assertion, can only be used on interfaces!</span>
+	<span class="c1"><i>// </i>A special type of type assertion, can only be used on interfaces.</span>
 	<span class="c1"><i>// </i><a href="https://golang.org/doc/effective_go.html#type_switch">https://golang.org/doc/effective_go.html#type_switch</a></span>
 	<span class="c1"><i>// </i>First case that matches is used, below both fmt.Stringer and interface{} will match,</span>
-	<span class=><h2><i>// </i>but &quot;stringer&quot; is printed</h2></span>
-	<span class="k">switch</span> <span class="nx">f</span> <span class="o">:=</span> <span class="nx">f</span><span class="p">.(</span><span class="kd">type</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1"><i>// </i>but &quot;stringer&quot; is printed.</span>
+	<span class="k">switch</span> <span class="nx">g</span> <span class="o">:=</span> <span class="nx">f</span><span class="p">.(</span><span class="kd">type</span><span class="p">)</span> <span class="p">{</span>
 	<span class="k">case</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Stringer</span><span class="p">:</span>
-		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;stringer&quot;</span><span class="p">,</span> <span class="nx">f</span><span class="p">)</span>
-	<span class="k">case</span> <span class="kd">interface</span><span class="p">{}:</span>
-		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;interface{}&quot;</span><span class="p">,</span> <span class="nx">f</span><span class="p">)</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;It&#39;s a Stringer&quot;</span><span class="p">,</span> <span class="nx">g</span><span class="p">)</span>
+	<span class="k">case</span> <span class="nx">FooBar</span><span class="p">:</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;It&#39;s a FooBar&quot;</span><span class="p">,</span> <span class="nx">g</span><span class="p">)</span>
 	<span class="k">default</span><span class="p">:</span>
-		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;throw an error or something&quot;</span><span class="p">)</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;You could throw an error here&quot;</span><span class="p">)</span>
 	<span class="p">}</span>
+	<span class="c1"><i>//= </i><output>It&#39;s a Stringer 4</output></span>
 
-	<span class=><h2><i>// </i>function types act a lot like interfaces</h2></span>
+	<span class="c1"><i>// </i>Function types act a lot like interfaces. More on this another time…</span>
 <span class="p">}</span>
 
 <span class="kd">func</span> <span class="nx">init</span><span class="p">()</span> <span class="p">{</span>
