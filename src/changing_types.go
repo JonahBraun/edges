@@ -4,7 +4,6 @@ https://github.com/JonahBraun/edges/issues
 https://github.com/JonahBraun/edges/issues
 
 The different ways a type can be changed in Go.
-
 */
 
 package main
@@ -21,12 +20,12 @@ func (f flint) String() string {
 	return strconv.Itoa(int(f))
 }
 
-func (f flint) Stringify() fmt.Stringer {
-	return f
+func (f flint) Foo() {
+	fmt.Println("Foo!")
 }
 
-func (f flint) Interfacify() interface{} {
-	return f
+type FooBar interface {
+	Foo()
 }
 
 func main() {
@@ -59,33 +58,39 @@ func main() {
 	// https://golang.org/doc/effective_go.html#interface_conversions
 
 	// Type assertion can only be performed on the interface type.
-	// obtain an interface from a function and then covert it
+	// First we declare a fmt.Stringer interface variable, then assign to it.
 	var e fmt.Stringer = c
-	//e := c.Stringify()
+	// Note the underlying type and value do not change. Interfaces only declare a
+	// set of functions, not the type or contents.
 	inspect(e)
-	f := e.(interface{})
+	//= main.flint 4
 
-	// declare an interface, assign to it and then convert it
-	var g fmt.Stringer
-	g = c
-	inspect(g)
-	inspect(g.(interface{}))
+	// We can convert the interface to another interface, since the underlying type
+	// and value is not changing, all we are really doing is asserting that the variable
+	// has a certain type. We can do this since our flint type has the Foo() function
+	// required for the FooBar interface.
+	f := e.(FooBar)
+
+	// Again, the type and value have not changed.
+	inspect(f)
+	//= main.flint 4
 
 	// Type Switch
-	// A special type of type assertion, can only be used on interfaces!
+	// A special type of type assertion, can only be used on interfaces.
 	// https://golang.org/doc/effective_go.html#type_switch
 	// First case that matches is used, below both fmt.Stringer and interface{} will match,
-	// but "stringer" is printed
-	switch f := f.(type) {
+	// but "stringer" is printed.
+	switch g := f.(type) {
 	case fmt.Stringer:
-		fmt.Println("stringer", f)
-	case interface{}:
-		fmt.Println("interface{}", f)
+		fmt.Println("It's a Stringer", g)
+	case FooBar:
+		fmt.Println("It's a FooBar", g)
 	default:
-		fmt.Println("throw an error or something")
+		fmt.Println("You could throw an error here")
 	}
+	//= It's a Stringer 4
 
-	// function types act a lot like interfaces
+	// Function types act a lot like interfaces. More on this another time…
 }
 
 func init() {
