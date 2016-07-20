@@ -1,0 +1,78 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Debug Print</title>
+  <meta name="author" content="Jonah Braun">
+  <link rel="license" href="https://creativecommons.org/licenses/by/3.0/">
+  <meta name="generator" content="bashfu">
+
+  <link rel="stylesheet" href="../style.css">
+	<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:300|Source+Sans+Pro' rel='stylesheet' type='text/css'>
+
+  <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+<article>
+
+<a id='header' href='../'><i>//</i>Edges┌─<br>
+<i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
+Status: <span style='background: #fbb'>Alpha</span>
+<div class="highlight"><pre><span class="cm"><i>/*</i></span>
+<span class=><h1>Debug Print</h1></span>
+<span class="cm"><a href="https://play.golang.org/p/A_Kf2l5zdL">https://play.golang.org/p/A_Kf2l5zdL</a></span>
+
+<span class="cm">Printing a variable is the most immediate debug method. Two ways are demonstrated.</span>
+<span class="cm"><i>*/</i></span>
+
+<span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="s">&quot;fmt&quot;</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class=><h2><i>// </i>The Builtin print() and println()</h2></span>
+	<span class="c1"><i>// </i><a href="https://golang.org/ref/spec#Bootstrapping">https://golang.org/ref/spec#Bootstrapping</a></span>
+	<span class="c1"><i>// </i>It is often necessary to debug a file that has not imported fmt. This is possible</span>
+	<span class="c1"><i>// </i>with the two builtin print functions.</span>
+
+	<span class="c1"><i>// </i>println() is the more useful one as it inserts spaces between multiple variables.</span>
+	<span class="nb">println</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">,</span> <span class="s">&quot;bar&quot;</span><span class="p">)</span>
+	<span class="c1"><i>//= </i><output>foo bar</output></span>
+
+	<span class="nb">println</span><span class="p">(</span><span class="s">&quot;biz&quot;</span><span class="p">,</span> <span class="s">&quot;baz&quot;</span><span class="p">)</span>
+	<span class="c1"><i>//= </i><output>biz baz</output></span>
+
+	<span class="nb">print</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">,</span> <span class="s">&quot;bar&quot;</span><span class="p">)</span>
+	<span class="nb">print</span><span class="p">(</span><span class="s">&quot;biz&quot;</span><span class="p">,</span> <span class="s">&quot;baz&quot;</span><span class="p">,</span> <span class="s">&quot;\n&quot;</span><span class="p">)</span>
+	<span class="c1"><i>//= </i><output>foobarbizbaz</output></span>
+
+	<span class=><h2><i>// </i>Printing Type And Value</h2></span>
+	<span class="c1"><i>// </i><a href="https://golang.org/pkg/fmt/">https://golang.org/pkg/fmt/</a></span>
+	<span class="c1"><i>// </i>%T and %#v are useful verbs in the fmt package for inspecting variables.</span>
+	<span class="c1"><i>// </i>The inspect() function defined below demonstrates their use. Let&#39;s see what</span>
+	<span class="c1"><i>// </i>it looks like for a string, int, map and array.</span>
+
+	<span class="nx">inspect</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;foo&quot;</span><span class="p">:</span> <span class="s">&quot;bar&quot;</span><span class="p">},</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="kt">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">})</span>
+	<span class="c1"><i>//= </i><output>string &quot;foo&quot;</output></span>
+	<span class="c1"><i>//= </i><output>int 4</output></span>
+	<span class="c1"><i>//= </i><output>map[string]string map[string]string{&quot;foo&quot;:&quot;bar&quot;}</output></span>
+	<span class="c1"><i>//= </i><output>[3]int [3]int{1, 2, 3}</output></span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">inspect</span><span class="p">(</span><span class="nx">v</span> <span class="o">...</span><span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">v</span> <span class="p">{</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;%T %#v \n&quot;</span><span class="p">,</span> <span class="nx">v</span><span class="p">,</span> <span class="nx">v</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<footer class="cm">
+<i>// </i><a href='https://github.com/JonahBraun/edges/issues/2'>Comments Page</a>
+</footer>
+</article>
+</body>
+</html>
