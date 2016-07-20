@@ -3,7 +3,7 @@ Checking If A Channel Is Ready
 https://github.com/JonahBraun/edges/issues
 https://github.com/JonahBraun/edges/issues
 
-Use a
+You can check if a channel is ready with a default case on a channel selector.
 */
 
 package main

@@ -30,7 +30,7 @@ func (b B) foo() {
 	//B.A.foo()
 	// Error: B.A undefined (type B has no method A)
 
-	// But you can typecast it first:
+	// But you can convert the type first:
 	A(b).foo()
 
 	b.bar = "bar b"
@@ -52,7 +52,7 @@ func (c C) foo() {
 	fmt.Println("C")
 
 	// “When we embed a type, the methods of that type become methods of the outer type, but when they are invoked, the receiver of the method is the inner type, not the outer one.” - Effective Go
-	// Access embedded type
+	// Let's access the embedded type:
 	c.A.foo()
 
 	// Type casting does not work:

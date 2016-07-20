@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
 
-  <title>Title</title>
+  <title>Channel Broadcast by Sending Close</title>
   <meta name="author" content="Jonah Braun">
   <link rel="license" href="https://creativecommons.org/licenses/by/3.0/">
   <meta name="generator" content="bashfu">
@@ -24,15 +24,21 @@
 <i>//</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of Go</a>
 Status: <span style='background: #fbb'>Alpha</span>
 <div class="highlight"><pre><span class="cm"><i>/*</i></span>
-<span class=><h1>Title</h1></span>
+<span class=><h1>Channel Broadcast by Sending Close</h1></span>
 <span class="cm"><a href="https://github.com/JonahBraun/edges/issues">https://github.com/JonahBraun/edges/issues</a></span>
 <span class="cm"><i>*/</i></span>
-<span class=><h2><i>// </i>Closing a channel is the only method of simulatenously communicating to</h2></span>
-<span class=><h2><i>// </i>all listening goroutines</h2></span>
-<span class=><h2>//</h2></span>
-<span class="c1"><i>// </i>Best line from the spec: <a href="https://golang.org/ref/spec#Send_statements">https://golang.org/ref/spec#Send_statements</a></span>
+<span class="c1"><i>// </i>Sending a value on a channel will result in only one receive, regardless of how</span>
+<span class="c1"><i>// </i>many goroutines are listening on the channel. This makes broadcasting to all</span>
+<span class="c1"><i>// </i>listening channels impossible without a loop.</span>
+
+<span class="c1"><i>// </i>However, closing a channel will result in all listeners receiving the zero value</span>
+<span class="c1"><i>// </i>for the channel type. For the purpose of signaling, &quot;sending a close&quot; is an effective</span>
+<span class="c1"><i>// </i>way of broadcast.</span>
+
+<span class="c1"><i>// </i>Be careful not to send after you have closed the channel, for:</span>
 <span class="c1"><i>// </i>&quot;A send on a closed channel proceeds by causing a run-time panic.&quot;</span>
-<span class=><h2>//</h2></span>
+<span class="c1"><i>// </i><a href="https://golang.org/ref/spec#Send_statements">https://golang.org/ref/spec#Send_statements</a></span>
+
 <span class="c1"><i>// </i>This script purposely ends in a deadlock.</span>
 <span class="kn">package</span> <span class="nx">main</span>
 
@@ -51,30 +57,32 @@ Status: <span style='background: #fbb'>Alpha</span>
 		<span class="o">&lt;-</span><span class="nx">c</span>
 		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;close a&quot;</span><span class="p">)</span>
 	<span class="p">}()</span>
-	<span class=><h2><i>// </i>pass the channel instead of enclose to demonostrate no magic</h2></span>
+
+	<span class="c1"><i>// </i>Pass the channel instead of enclose to demonostrate no magic.</span>
 	<span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">c</span> <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
 		<span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
 		<span class="o">&lt;-</span><span class="nx">c</span>
 		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;close c&quot;</span><span class="p">)</span>
 	<span class="p">}(</span><span class="nx">c</span><span class="p">)</span>
 
-	<span class=><h2><i>// </i>this sends the zero value of the channel</h2></span>
+	<span class="c1"><i>// </i>This sends the zero value of the channel.</span>
 	<span class="nb">close</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
 	<span class="nx">wg</span><span class="p">.</span><span class="nx">Wait</span><span class="p">()</span>
 
-	<span class=><h2><i>// </i>beware not to close again</h2></span>
+	<span class="c1"><i>// </i>Beware not to close again:.</span>
 	<span class=><h2><b>//</b><code>close(c)</h2></code></span>
-	<span class="c1"><i>// </i>panic: close of closed channel</span>
+	<span class="c1"><i>//= </i><output>panic: close of closed channel</output></span>
 
-	<span class="c1"><i>// </i>but you can read from it again, as much as you like</span>
+	<span class="c1"><i>// </i>But you can read from it again, as much as you like.</span>
 	<span class="o">&lt;-</span><span class="nx">c</span>
 	<span class="o">&lt;-</span><span class="nx">c</span>
 
 	<span class="nx">c</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
 	<span class="nx">wg</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-	<span class="c1"><i>// </i>When doing this, do not test for a zero value to detect a close!</span>
-	<span class="c1"><i>// </i>Instead, use the comma-ok idiom</span>
-	<span class=><h2><i>// </i>the second boolean yields false for a nil or closed channel</h2></span>
+
+	<span class="c1"><i>// </i>When doing this, do not test for a zero value to detect a close! This can be</span>
+	<span class="c1"><i>// </i>confused with sending the zero value. Instead, use the comma-ok idiom. The</span>
+	<span class="c1"><i>// </i>second value will be false for a nil or closed channel.</span>
 	<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
 		<span class="k">defer</span> <span class="nx">wg</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
 		<span class="nx">_</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">c</span>
@@ -82,8 +90,8 @@ Status: <span style='background: #fbb'>Alpha</span>
 	<span class="p">}()</span>
 	<span class="nb">close</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
 
-	<span class="c1"><i>// </i>the above method is the only method doing this. A naïve approach of</span>
-	<span class=><h2><i>// </i>many routines listening to one channel does not work</h2></span>
+	<span class="c1"><i>// </i>The above method is the only method doing this. A naïve approach of</span>
+	<span class="c1"><i>// </i>many routines listening to one channel does not work.</span>
 
 	<span class="nx">s</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">string</span><span class="p">)</span>
 	<span class="nx">wg</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -98,9 +106,9 @@ Status: <span style='background: #fbb'>Alpha</span>
 	<span class="p">}()</span>
 	<span class="nx">s</span> <span class="o">&lt;-</span> <span class="s">&quot;This will only print once&quot;</span>
 
-	<span class="c1"><i>// </i>We will wait in vain, this script ends in a fatal error</span>
+	<span class="c1"><i>// </i>We will wait in vain, this script ends in a fatal error.</span>
 	<span class="nx">wg</span><span class="p">.</span><span class="nx">Wait</span><span class="p">()</span>
-	<span class="c1"><i>// </i>fatal error: all goroutines are asleep - deadlock!</span>
+	<span class="c1"><i>//= </i><output>fatal error: all goroutines are asleep - deadlock!</output></span>
 <span class="p">}</span>
 </pre></div>
 <footer class="cm">
