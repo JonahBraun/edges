@@ -8,7 +8,7 @@ package main
 
 import "fmt"
 
-// Interfaces in Go all you to specify expected behavior. Unfortunately, the interface
+// Interfaces in Go allow you to specify expected behavior. Unfortunately, the interface
 // type can only specify functions, not fields.
 
 // This ommission is noticeable when considering that channels provide functionality!
